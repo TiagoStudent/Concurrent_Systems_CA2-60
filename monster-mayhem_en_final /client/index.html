@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster Mayhem</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Monster Mayhem</h1>
+
+    <div id="connection-status">Connecting to server...</div>
+    <div id="player-info">Your ID: <span id="player-id"></span></div>
+    <div id="stats">
+        Global Games Played: <span id="global-games-played">0</span> | 
+        Your Wins: <span id="player-wins">0</span> | 
+        Your Losses: <span id="player-losses">0</span>
+    </div>
+
+    <hr>
+
+    <div id="lobby" class="hidden">
+        <h2>Lobby</h2>
+        <button id="create-game-btn">Create New Game</button>
+        <h3>Available Games:</h3>
+        <ul id="available-games-list"></ul>
+    </div>
+
+    <div id="game-area" class="hidden">
+        <h2>Game: <span id="game-id"></span></h2>
+        <div id="game-status">Waiting for players...</div>
+        <div id="turn-info"></div>
+        <div id="players-list">Players:</div>
+        <button id="start-game-btn" class="hidden">Start Game</button>
+
+        <div id="board-container">
+            <div id="game-board"></div>
+        </div>
+
+        <div id="controls">
+            <h3>Controls</h3>
+            <div id="monster-selection">
+                <h4>Place Monster:</h4>
+                <button data-type="vampire">Vampire</button>
+                <button data-type="werewolf">Werewolf</button>
+                <button data-type="ghost">Ghost</button>
+            </div>
+            <div id="action-buttons">
+                <button id="end-turn-btn">End Turn</button>
+            </div>
+        </div>
+        <div id="message-log"></div>
+    </div>
+
+    <div id="error-message" class="error"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
