@@ -15,6 +15,10 @@ const PORT = process.env.PORT || 3000;
 const clientPath = path.join(__dirname, "../client");
 app.use(express.static(clientPath));
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(clientPath, "index.html"));
+});
+
 // Game state variables
 let games = {}; // { gameId: Game object }
 let players = {}; // { socketId: { id, gameId, wins, losses } }
