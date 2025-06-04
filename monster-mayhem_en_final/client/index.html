@@ -3,57 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monster Mayhem</title>
+    <title>Monster Mayhem - Jogo de Tabuleiro Multiplayer</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <h1>Monster Mayhem</h1>
-
-    <div id="connection-status">Connecting to server...</div>
-    <div id="player-info">Your ID: <span id="player-id"></span></div>
-    <div id="stats">
-        Global Games Played: <span id="global-games-played">0</span> | 
-        Your Wins: <span id="player-wins">0</span> | 
-        Your Losses: <span id="player-losses">0</span>
-    </div>
-
-    <hr>
-
-    <div id="lobby" class="hidden">
-        <h2>Lobby</h2>
-        <button id="create-game-btn">Create New Game</button>
-        <h3>Available Games:</h3>
-        <ul id="available-games-list"></ul>
-    </div>
-
-    <div id="game-area" class="hidden">
-        <h2>Game: <span id="game-id"></span></h2>
-        <div id="game-status">Waiting for players...</div>
-        <div id="turn-info"></div>
-        <div id="players-list">Players:</div>
-        <button id="start-game-btn" class="hidden">Start Game</button>
-
-        <div id="board-container">
-            <div id="game-board"></div>
-        </div>
-
-        <div id="controls">
-            <h3>Controls</h3>
-            <div id="monster-selection">
-                <h4>Place Monster:</h4>
-                <button data-type="vampire">Vampire</button>
-                <button data-type="werewolf">Werewolf</button>
-                <button data-type="ghost">Ghost</button>
-            </div>
-            <div id="action-buttons">
-                <button id="end-turn-btn">End Turn</button>
+    <!-- Header -->
+    <header class="game-header">
+        <div class="header-content">
+            <h1 class="game-title">
+                <i class="fas fa-skull"></i>
+                Monster Mayhem
+                <i class="fas fa-skull"></i>
+            </h1>
+            <div class="connection-indicator">
+                <div id="connection-status" class="status-connecting">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                    Conectando ao servidor...
+                </div>
             </div>
         </div>
-        <div id="message-log"></div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Player Info Panel -->
+        <div class="info-panel">
+            <div class="player-card">
+                <div class="player-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="player-details">
+                    <div class="player-id-label">Seu ID:</div>
+                    <div id="player-id" class="player-id-value">Carregando...</div>
+                </div>
+            </div>
+            
+            <div class="stats-panel">
+                <h3><i class="fas fa-chart-bar"></i> Estatísticas</h3>
+                <div class="stats-grid">
+                    <div class="stat-item global">
+                        <div class="stat-icon"><i class="fas fa-globe"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-label">Jogos Globais</div>
+                            <div id="global-games-played" class="stat-value">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-item wins">
+                        <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-label">Vitórias</div>
+                            <div id="player-wins" class="stat-value">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-item losses">
+                        <div class="stat-icon"><i class="fas fa-skull-crossbones"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-label">Derrotas</div>
+                            <div id="player-losses" class="stat-value">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Content -->
+        <div class="game-content">
+            <!-- Lobby Section -->
+            <div id="lobby" class="lobby-section hidden">
+                <div class="lobby-header">
+                    <h2><i class="fas fa-users"></i> Lobby de Jogos</h2>
+                    <button id="create-game-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Criar Novo Jogo
+                    </button>
+                </div>
+                
+                <div class="available-games">
+                    <h3><i class="fas fa-list"></i> Jogos Disponíveis</h3>
+                    <div id="available-games-container">
+                        <ul id="available-games-list" class="games-list"></ul>
+                        <div id="no-games-message" class="no-games hidden">
+                            <i class="fas fa-ghost"></i>
+                            <p>Nenhum jogo disponível no momento</p>
+                            <p class="subtitle">Crie um novo jogo para começar!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Area -->
+            <div id="game-area" class="game-section hidden">
+                <div class="game-header-info">
+                    <div class="game-title-section">
+                        <h2>
+                            <i class="fas fa-gamepad"></i>
+                            Jogo: <span id="game-id">Carregando...</span>
+                        </h2>
+                        <div id="game-status" class="game-status">Aguardando jogadores...</div>
+                    </div>
+                    
+                    <div class="game-controls-header">
+                        <button id="start-game-btn" class="btn btn-success hidden">
+                            <i class="fas fa-play"></i>
+                            Iniciar Jogo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="game-info-bar">
+                    <div id="turn-info" class="turn-indicator"></div>
+                    <div id="round-info" class="round-indicator">
+                        <i class="fas fa-clock"></i>
+                        Rodada: <span id="round-number">1</span>
+                    </div>
+                </div>
+
+                <div id="players-list" class="players-section">
+                    <h3><i class="fas fa-users"></i> Jogadores</h3>
+                    <div id="players-container" class="players-grid"></div>
+                </div>
+
+                <!-- Game Board Container -->
+                <div class="board-section">
+                    <div id="board-container" class="board-container">
+                        <div class="board-labels">
+                            <div class="board-label top">TOPO</div>
+                            <div class="board-label bottom">FUNDO</div>
+                            <div class="board-label left">ESQUERDA</div>
+                            <div class="board-label right">DIREITA</div>
+                        </div>
+                        <div id="game-board" class="game-board"></div>
+                        <div class="board-coordinates">
+                            <div class="coord-row coord-top">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+                                <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+                            </div>
+                            <div class="coord-col coord-left">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+                                <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Controls -->
+                <div id="controls" class="controls-section hidden">
+                    <div class="controls-header">
+                        <h3><i class="fas fa-hand-pointer"></i> Controles do Jogo</h3>
+                        <div class="selection-indicator" id="selection-indicator">
+                            Clique em um monstro para selecionar
+                        </div>
+                    </div>
+                    
+                    <div class="controls-grid">
+                        <div class="monster-selection">
+                            <h4><i class="fas fa-plus-circle"></i> Colocar Monstro</h4>
+                            <div class="monster-buttons">
+                                <button class="monster-btn vampire" data-type="vampire">
+                                    <div class="monster-icon">🧛</div>
+                                    <div class="monster-name">Vampiro</div>
+                                    <div class="monster-power">Vence Fantasma</div>
+                                </button>
+                                <button class="monster-btn werewolf" data-type="werewolf">
+                                    <div class="monster-icon">🐺</div>
+                                    <div class="monster-name">Lobisomem</div>
+                                    <div class="monster-power">Vence Vampiro</div>
+                                </button>
+                                <button class="monster-btn ghost" data-type="ghost">
+                                    <div class="monster-icon">👻</div>
+                                    <div class="monster-name">Fantasma</div>
+                                    <div class="monster-power">Vence Lobisomem</div>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="action-controls">
+                            <h4><i class="fas fa-cogs"></i> Ações</h4>
+                            <div class="action-buttons">
+                                <button id="end-turn-btn" class="btn btn-warning">
+                                    <i class="fas fa-forward"></i>
+                                    Finalizar Turno
+                                </button>
+                                <button id="clear-selection-btn" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i>
+                                    Limpar Seleção
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Log -->
+                <div class="message-section">
+                    <h3><i class="fas fa-comments"></i> Log de Mensagens</h3>
+                    <div id="message-log" class="message-log"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Error/Notification Toast -->
+    <div id="toast-container" class="toast-container">
+        <div id="error-toast" class="toast toast-error hidden">
+            <div class="toast-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="error-message"></span>
+            </div>
+            <button class="toast-close" onclick="hideToast('error-toast')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div id="success-toast" class="toast toast-success hidden">
+            <div class="toast-content">
+                <i class="fas fa-check-circle"></i>
+                <span id="success-message"></span>
+            </div>
+            <button class="toast-close" onclick="hideToast('success-toast')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
     </div>
 
-    <div id="error-message" class="error"></div>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <i class="fas fa-skull fa-spin"></i>
+            </div>
+            <div class="loading-text">Carregando...</div>
+        </div>
+    </div>
 
+    <!-- Scripts -->
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
