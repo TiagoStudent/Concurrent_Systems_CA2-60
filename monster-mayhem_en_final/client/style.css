@@ -845,6 +845,18 @@ body {
     text-align: center;
     position: relative;
     overflow: hidden;
+    
+    /* Ensure clickability on all devices */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    
+    /* Ensure proper pointer events */
+    pointer-events: auto;
 }
 
 .monster-btn::before {

@@ -1,5 +1,4 @@
 /**
- * Monster Mayhem Client JavaScript
  * 
  * This file handles all client-side functionality for the Monster Mayhem game.
  * It manages the user interface, game state, and communication with the server.
@@ -19,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 
     // UI ELEMENT REFERENCES
+    // 
 
     // Connection and Status
     const connectionStatus = document.getElementById("connection-status");
@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const successMessage = document.getElementById("success-message");
     const loadingOverlay = document.getElementById("loading-overlay");
 
+    // 
     // GAME STATE VARIABLES
     // 
 
@@ -71,8 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let validMoves = [];
     let validPlacements = [];
 
+    // 
     // UTILITY FUNCTIONS
-    
+    // 
 
     /**
      * Show the lobby and hide game area
@@ -91,6 +93,9 @@ document.addEventListener("DOMContentLoaded", () => {
         lobbyDiv.classList.add("hidden");
         gameAreaDiv.classList.remove("hidden");
         gameAreaDiv.classList.add("animate-fade-in");
+        
+        // Setup monster buttons when game area is shown
+        setupMonsterButtons();
     }
 
     /**
@@ -604,7 +609,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // 
     // SOCKET EVENT HANDLERS
+    // 
 
     socket.on("connect", () => {
         connectionStatus.textContent = "Connected to server";
@@ -694,7 +701,9 @@ document.addEventListener("DOMContentLoaded", () => {
         logMessage(`Error: ${msg}`, 'error');
     });
 
+    // 
     // UI EVENT HANDLERS
+    // 
 
     createGameBtn.addEventListener('click', () => {
         showLoading("Creating game...");
@@ -720,13 +729,28 @@ document.addEventListener("DOMContentLoaded", () => {
         logMessage("Selection cleared", 'system');
     });
 
-    // Monster selection buttons
-    monsterSelection.addEventListener('click', (e) => {
-        const button = e.target.closest('.monster-btn');
+    // Monster selection buttons - Direct event listeners for better compatibility
+    function setupMonsterButtons() {
+        const monsterButtons = document.querySelectorAll('.monster-btn');
+        monsterButtons.forEach(button => {
+            // Remove any existing listeners
+            button.removeEventListener('click', handleMonsterButtonClick);
+            // Add new listener
+            button.addEventListener('click', handleMonsterButtonClick);
+        });
+    }
+
+    function handleMonsterButtonClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const button = e.currentTarget;
         if (!button || button.disabled) return;
         
         const monsterType = button.dataset.type;
         if (!monsterType) return;
+        
+        console.log(`Monster button clicked: ${monsterType}`); // Debug log
         
         // Clear previous selections
         clearGameSelections();
@@ -741,14 +765,17 @@ document.addEventListener("DOMContentLoaded", () => {
         updateSelectionIndicator();
         
         logMessage(`Selected ${monsterType} to place`, 'system');
-    });
+    }
 
     // 
     // INITIALIZATION
-    
+    // 
 
     // Render empty board initially
     renderBoard(Array(10).fill(null).map(() => Array(10).fill(null)));
+    
+    // Setup monster buttons
+    setupMonsterButtons();
     
     // Show loading initially
     showLoading("Connecting to server...");
