@@ -61,6 +61,7 @@ app.get("/", (req, res) => {
 
 // 
 // GAME STATE MANAGEMENT
+// 
 
 let games = {}; // { gameId: Game object }
 let players = {}; // { socketId: { id, gameId, wins, losses, lastActivity } }
@@ -74,7 +75,7 @@ let statsLock = false;
 
 /**
  * Safely update global statistics with concurrency control
-@param {Function} updateFunction - Function to perform the update
+ * @param {Function} updateFunction - Function to perform the update
  */
 function safeStatsUpdate(updateFunction) {
     if (statsLock) {
@@ -89,7 +90,9 @@ function safeStatsUpdate(updateFunction) {
     }
 }
 
-/* Broadcast the list of available games to players in lobb */
+/**
+ * Broadcast the list of available games to players in lobby
+ */
 function broadcastGameList() {
     const availableGames = Object.values(games)
         .filter(game => game.status === "waiting" && game.playerOrder.length < 4)
@@ -208,9 +211,9 @@ function validatePlayerAction(socketId, gameId) {
     return { valid: true, game, playerInfo };
 }
 
-
+// 
 // SOCKET.IO EVENT HANDLERS
-
+// 
 
 io.on("connection", (socket) => {
     console.log(`Player connected: ${socket.id}`);
@@ -239,11 +242,13 @@ io.on("connection", (socket) => {
     // Send available games list
     broadcastGameList();
 
-    
+    // 
     // GAME MANAGEMENT EVENTS
-    //  
+    // 
 
-    /* Handle game creation request */
+    /**
+     * Handle game creation request
+     */
     socket.on("create_game", () => {
         try {
             if (players[socket.id]?.gameId) {
@@ -265,7 +270,9 @@ io.on("connection", (socket) => {
         }
     });
 
-    /* Handle game join request */
+    /**
+     * Handle game join request
+     */
     socket.on("join_game", (gameId) => {
         try {
             if (players[socket.id]?.gameId) {
@@ -290,7 +297,13 @@ io.on("connection", (socket) => {
                 players[socket.id].gameId = gameId;
                 socket.join(gameId);
                 console.log(`Player ${socket.id} joined game ${gameId}`);
-                io.to(gameId).emit("game_update", game.getState());
+                
+                // Send game_joined to the new player (triggers showGameArea)
+                socket.emit("game_joined", game.getState());
+                
+                // Send game_update to other players in the game
+                socket.to(gameId).emit("game_update", game.getState());
+                
                 broadcastGameList();
             } else {
                 socket.emit("error_message", result.message || "Could not join game.");
@@ -301,7 +314,9 @@ io.on("connection", (socket) => {
         }
     });
 
-    /** Handle game start request */
+    /**
+     * Handle game start request
+     */
     socket.on("start_game", () => {
         try {
             const gameId = players[socket.id]?.gameId;
@@ -336,11 +351,13 @@ io.on("connection", (socket) => {
         }
     });
 
-    
+    // 
     // GAME ACTION EVENTS
     // 
 
-    /** Handle game actions (place monster, move monster, end turn) */
+    /**
+     * Handle game actions (place monster, move monster, end turn)
+     */
     socket.on("game_action", (data) => {
         try {
             const gameId = players[socket.id]?.gameId;
@@ -408,11 +425,13 @@ io.on("connection", (socket) => {
         }
     });
 
-    
+    // 
     // UTILITY EVENTS
     // 
 
-    /* Handle lobby data requests */
+    /**
+     * Handle lobby data requests
+     */
     socket.on("request_lobby_data", () => {
         try {
             if (players[socket.id] && !players[socket.id].gameId) {
@@ -435,10 +454,13 @@ io.on("connection", (socket) => {
         }
     });
 
-    
+    // 
     // DISCONNECT HANDLING
+    // 
 
-    /* Handle player disconnection */
+    /**
+     * Handle player disconnection
+     */
     socket.on("disconnect", () => {
         try {
             console.log(`Player disconnected: ${socket.id}`);
@@ -479,8 +501,9 @@ io.on("connection", (socket) => {
     });
 });
 
-
+// 
 // SERVER STARTUP
+// 
 
 server.listen(PORT, "0.0.0.0", () => {
     console.log(`Monster Mayhem server listening on port ${PORT}`);

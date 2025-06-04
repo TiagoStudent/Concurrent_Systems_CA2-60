@@ -17,9 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize Socket.IO connection
     const socket = io();
 
-    
+    // 
     // UI ELEMENT REFERENCES
-
 
     // Connection and Status
     const connectionStatus = document.getElementById("connection-status");
@@ -62,9 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const successMessage = document.getElementById("success-message");
     const loadingOverlay = document.getElementById("loading-overlay");
 
-    // 
     // GAME STATE VARIABLES
-     
+    // 
 
     let myPlayerId = null;
     let currentGameState = null;
@@ -73,13 +71,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let validMoves = [];
     let validPlacements = [];
 
-    
     // UTILITY FUNCTIONS
     
 
-    
-    //Show the lobby and hide game area
-    
+    /**
+     * Show the lobby and hide game area
+     */
     function showLobby() {
         lobbyDiv.classList.remove("hidden");
         gameAreaDiv.classList.add("hidden");
@@ -87,18 +84,19 @@ document.addEventListener("DOMContentLoaded", () => {
         clearGameSelections();
     }
 
-    
-    //Show the game area and hide lobby
-    
+    /**
+     * Show the game area and hide lobby
+     */
     function showGameArea() {
         lobbyDiv.classList.add("hidden");
         gameAreaDiv.classList.remove("hidden");
         gameAreaDiv.classList.add("animate-fade-in");
     }
 
-    //Show loading overlay
-    
-    function showLoading(text = "Carregando...") {
+    /**
+     * Show loading overlay
+     */
+    function showLoading(text = "Loading...") {
         loadingOverlay.querySelector(".loading-text").textContent = text;
         loadingOverlay.classList.remove("hidden");
     }
@@ -195,19 +193,19 @@ document.addEventListener("DOMContentLoaded", () => {
             
             li.innerHTML = `
                 <div class="game-info">
-                    <div class="game-id">Jogo ${game.id.substring(0, 8)}...</div>
-                    <div class="game-players">${game.playerCount}/${game.maxPlayers || 4} jogadores</div>
+                    <div class="game-id">Game ${game.id.substring(0, 8)}...</div>
+                    <div class="game-players">${game.playerCount}/${game.maxPlayers || 4} players</div>
                 </div>
                 <button class="btn btn-primary join-game-btn" data-game-id="${game.id}">
                     <i class="fas fa-sign-in-alt"></i>
-                    Entrar
+                    Join
                 </button>
             `;
             
             // Add join button event listener
             const joinBtn = li.querySelector('.join-game-btn');
             joinBtn.addEventListener('click', () => {
-                showLoading("Entrando no jogo...");
+                showLoading("Joining game...");
                 socket.emit("join_game", game.id);
             });
             
@@ -240,12 +238,12 @@ document.addEventListener("DOMContentLoaded", () => {
      * Update the selection indicator text
      */
     function updateSelectionIndicator() {
-        let text = "Clique em um monstro para selecionar";
+        let text = "Click on a monster to select";
         
         if (selectedMonsterType) {
-            text = `${selectedMonsterType} selecionado - Clique em uma casa válida na sua borda`;
+            text = `${selectedMonsterType} selected - Click on a valid square on your edge`;
         } else if (selectedMonsterToMove) {
-            text = `Monstro selecionado - Clique em uma casa válida para mover`;
+            text = `Monster selected - Click on a valid square to move`;
         }
         
         selectionIndicator.textContent = text;
@@ -409,7 +407,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Update game status and controls based on game state
         if (gameState.status === "waiting") {
-            gameStatus.textContent = `Aguardando jogadores (${gameState.playerOrder.length}/4)...`;
+            gameStatus.textContent = `Waiting for players (${gameState.playerOrder.length}/4)...`;
             gameStatus.className = "game-status";
             
             // Show start button only if >= 2 players and I am the creator
@@ -423,14 +421,14 @@ document.addEventListener("DOMContentLoaded", () => {
             controlsDiv.classList.add("hidden");
             
         } else if (gameState.status === "active") {
-            gameStatus.textContent = `Jogo em andamento - Rodada ${gameState.round}`;
+            gameStatus.textContent = `Game in progress - Round ${gameState.round}`;
             gameStatus.className = "game-status";
             startGameBtn.classList.add("hidden");
             controlsDiv.classList.remove("hidden");
             
             // Update turn information
             if (gameState.currentPlayerId === myPlayerId) {
-                turnInfo.textContent = "É o seu turno!";
+                turnInfo.textContent = "It's your turn!";
                 turnInfo.className = "turn-indicator your-turn";
                 
                 // Enable controls
@@ -445,7 +443,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
             } else {
                 const currentPlayerName = gameState.currentPlayerId.substring(0, 4);
-                turnInfo.textContent = `Turno: ${currentPlayerName}`;
+                turnInfo.textContent = `Turn: ${currentPlayerName}`;
                 turnInfo.className = "turn-indicator waiting";
                 
                 // Disable controls
@@ -455,7 +453,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             
         } else if (gameState.status === "finished") {
-            gameStatus.textContent = "Jogo finalizado!";
+            gameStatus.textContent = "Game finished!";
             gameStatus.className = "game-status";
             turnInfo.textContent = "";
             controlsDiv.classList.add("hidden");
@@ -493,13 +491,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${player.edge.toUpperCase()}
                 </div>
                 <div class="player-name">
-                    ${isMe ? 'VOCÊ' : playerId.substring(0, 6)}
+                    ${isMe ? 'YOU' : playerId.substring(0, 6)}
                     ${isCurrentPlayer ? ' 🎯' : ''}
                     ${isEliminated ? ' ☠️' : ''}
                 </div>
                 <div class="player-stats">
-                    <span>Monstros: ${player.monsterCount}</span>
-                    <span>Perdidos: ${player.monstersLost}</span>
+                    <span>Monsters: ${player.monsterCount}</span>
+                    <span>Lost: ${player.monstersLost}</span>
                 </div>
             `;
             
@@ -567,12 +565,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const isValidPlacement = validPlacements.some(pos => pos.x === x && pos.y === y);
             
             if (isValidPlacement) {
-                logMessage(`Colocando ${selectedMonsterType} em (${x}, ${y})`, 'system');
-                showLoading("Colocando monstro...");
+                logMessage(`Placing ${selectedMonsterType} at (${x}, ${y})`, 'system');
+                showLoading("Placing monster...");
                 socket.emit("game_action", { action: "place_monster", type: selectedMonsterType, x, y });
                 clearGameSelections();
             } else {
-                showToast('error', 'Posição inválida para colocar monstro');
+                showToast('error', 'Invalid position to place monster');
             }
             
         } else if (selectedMonsterToMove) {
@@ -580,12 +578,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const isValidMove = validMoves.some(pos => pos.x === x && pos.y === y);
             
             if (isValidMove) {
-                logMessage(`Movendo monstro para (${x}, ${y})`, 'system');
-                showLoading("Movendo monstro...");
+                logMessage(`Moving monster to (${x}, ${y})`, 'system');
+                showLoading("Moving monster...");
                 socket.emit("game_action", { action: "move_monster", monsterId: selectedMonsterToMove.id, newX: x, newY: y });
                 clearGameSelections();
             } else {
-                showToast('error', 'Movimento inválido');
+                showToast('error', 'Invalid move');
             }
             
         } else if (monsterOnSquare && monsterOnSquare.owner === myPlayerId) {
@@ -598,28 +596,26 @@ document.addEventListener("DOMContentLoaded", () => {
             updateBoardVisuals();
             updateSelectionIndicator();
             
-            logMessage(`Selecionou seu ${monsterOnSquare.type} em (${x}, ${y})`, 'system');
+            logMessage(`Selected your ${monsterOnSquare.type} at (${x}, ${y})`, 'system');
             
         } else {
             // Invalid click
-            showToast('error', 'Clique inválido');
+            showToast('error', 'Invalid click');
         }
     }
 
-    
     // SOCKET EVENT HANDLERS
-    
 
     socket.on("connect", () => {
-        connectionStatus.textContent = "Conectado ao servidor";
+        connectionStatus.textContent = "Connected to server";
         connectionStatus.className = "status-connected";
         showLobby();
         hideLoading();
-        logMessage("Conectado ao servidor", 'success');
+        logMessage("Connected to server", 'success');
     });
 
     socket.on("disconnect", () => {
-        connectionStatus.textContent = "Desconectado do servidor";
+        connectionStatus.textContent = "Disconnected from server";
         connectionStatus.className = "status-disconnected";
         showLobby();
         lobbyDiv.classList.add("hidden");
@@ -627,15 +623,15 @@ document.addEventListener("DOMContentLoaded", () => {
         currentGameState = null;
         myPlayerId = null;
         clearGameSelections();
-        showToast('error', 'Conexão perdida com o servidor');
-        logMessage("Desconectado do servidor", 'error');
+        showToast('error', 'Connection lost to server');
+        logMessage("Disconnected from server", 'error');
     });
 
     socket.on("initial_data", (data) => {
         myPlayerId = data.playerId;
         playerIdDisplay.textContent = myPlayerId.substring(0, 8) + "...";
         updateStats(data.globalStats, data.playerStats);
-        logMessage(`Conectado como jogador ${myPlayerId.substring(0, 8)}`, 'success');
+        logMessage(`Connected as player ${myPlayerId.substring(0, 8)}`, 'success');
     });
 
     socket.on("available_games", (games) => {
@@ -646,28 +642,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     socket.on("game_joined", (gameState) => {
         hideLoading();
-        logMessage(`Entrou no jogo ${gameState.id.substring(0, 8)}`, 'success');
+        logMessage(`Joined game ${gameState.id.substring(0, 8)}`, 'success');
         showGameArea();
         updateGameView(gameState);
-        showToast('success', 'Entrou no jogo com sucesso!');
+        showToast('success', 'Successfully joined the game!');
     });
 
     socket.on("game_update", (gameState) => {
         hideLoading();
-        logMessage("Estado do jogo atualizado", 'system');
+        logMessage("Game state updated", 'system');
         updateGameView(gameState);
     });
 
     socket.on("game_started", (gameState) => {
         hideLoading();
-        logMessage("O jogo começou!", 'success');
+        logMessage("The game has started!", 'success');
         updateGameView(gameState);
-        showToast('success', 'O jogo começou!');
+        showToast('success', 'The game has started!');
     });
 
     socket.on("game_over", (data) => {
         hideLoading();
-        logMessage(`Fim de jogo: ${data.message}`, 'system');
+        logMessage(`Game over: ${data.message}`, 'system');
         showToast('success', data.message);
         
         if (currentGameState) {
@@ -695,27 +691,25 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.on("error_message", (msg) => {
         hideLoading();
         showToast('error', msg);
-        logMessage(`Erro: ${msg}`, 'error');
+        logMessage(`Error: ${msg}`, 'error');
     });
 
-    
     // UI EVENT HANDLERS
-    
 
     createGameBtn.addEventListener('click', () => {
-        showLoading("Criando jogo...");
+        showLoading("Creating game...");
         socket.emit("create_game");
     });
 
     startGameBtn.addEventListener('click', () => {
-        showLoading("Iniciando jogo...");
+        showLoading("Starting game...");
         socket.emit("start_game");
     });
 
     endTurnBtn.addEventListener('click', () => {
         if (currentGameState && currentGameState.currentPlayerId === myPlayerId) {
-            logMessage("Finalizando turno...", 'system');
-            showLoading("Finalizando turno...");
+            logMessage("Ending turn...", 'system');
+            showLoading("Ending turn...");
             socket.emit("game_action", { action: "end_turn" });
             clearGameSelections();
         }
@@ -723,7 +717,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clearSelectionBtn.addEventListener('click', () => {
         clearGameSelections();
-        logMessage("Seleção limpa", 'system');
+        logMessage("Selection cleared", 'system');
     });
 
     // Monster selection buttons
@@ -746,7 +740,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateBoardVisuals();
         updateSelectionIndicator();
         
-        logMessage(`Selecionou ${monsterType} para colocar`, 'system');
+        logMessage(`Selected ${monsterType} to place`, 'system');
     });
 
     // 
@@ -757,8 +751,8 @@ document.addEventListener("DOMContentLoaded", () => {
     renderBoard(Array(10).fill(null).map(() => Array(10).fill(null)));
     
     // Show loading initially
-    showLoading("Conectando ao servidor...");
+    showLoading("Connecting to server...");
     
-    logMessage("Cliente Monster Mayhem iniciado", 'system');
+    logMessage("Monster Mayhem client started", 'system');
 });
 
